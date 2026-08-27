@@ -1,0 +1,149 @@
+# SPEC — Tlon
+
+## Purpose
+
+A person who owns data systems they did not design uses Tlon to record what those systems physically contain, author the business meaning that sits on top of them, and generate reviewable artifacts that can be traced back to the request that justified building each capability.
+
+## Requirements
+
+### Cataloging what exists
+
+| ID | E/A | Requirement |
+|----|-----|-------------|
+| R1 | E | When a person registers a source system, the system lists it among the known sources with its kind and name. |
+| R2 | E | When a person inspects a registered source, the system records every collection that source exposes and reports how many it found. |
+| R3 | E | When a person inspects a registered source, the system records each collection's attributes with their declared types and reports how many it found. |
+| R4 | E | When a source declares a relationship between collections, the system records it with its participants, direction, and cardinality. |
+| R5 | E | When a source is inspected again, the system keeps the identity of every collection and attribute that still exists, so anything a person attached to them survives. |
+| R6 | E | When a collection or attribute is missing from a later inspection, the system marks it absent and keeps its record rather than discarding it. |
+| R7 | E | When a person asks what a source contains, the system reports its collections, their attributes, and the relationships between them. |
+| R8 | A | When a new kind of source is added, the system exposes it through the same parent contract as every existing kind. User-demanded: "each type of thing (ex CatalogSource, SchemaSource, etc) has a parent Source with SourceInterface etc". |
+| R9 | A | When a kind of source needs behavior beyond the shared contract, the system supplies that behavior as a separate collaborating part rather than by specializing the parent. User-demanded: "we want to prioritize composition when things get complex especially in downstream ingestion". |
+
+### Authoring what it means
+
+| ID | E/A | Requirement |
+|----|-----|-------------|
+| R10 | E | When a person creates a semantic model, the system records its name, business domain, declared grain, and lifecycle state, and lists it. |
+| R11 | E | When a person adds an entity to a semantic model, the system reports that entity as part of that model. |
+| R12 | E | When a person adds a dimension, a metric, or a semantic relationship to an entity, the system records it with its kind and its definition. |
+| R13 | E | When a person binds a semantic concept to a catalog collection or attribute, the system reports that concept as bound. |
+| R14 | E | When a person attaches a vocabulary term to a semantic concept, the system records the term and which kind of term it is. |
+| R15 | E | When two semantic models each define a concept under the same name, the system keeps the two concepts distinct. |
+
+### Recording why it is trusted
+
+| ID | E/A | Requirement |
+|----|-----|-------------|
+| R16 | E | When a person records a request, the system preserves its exact wording unchanged, together with who asked and where it came from. |
+| R17 | E | When a person normalizes a request into a question, the system records the question, its disposition, and its expected result grain, and keeps the link to the exact wording it came from. |
+| R18 | E | When a person states which concepts a question needs, the system records each concept together with the role it plays in answering. |
+| R19 | E | When a person records a verified query, the system stores the question, the query text, the named person who attested it, and when they did. |
+| R20 | E | When a query has been run but no named person has attested it, the system reports it as unverified. |
+| R21 | E | When a person records an evaluation case, the system stores its kind and the behavior it expects. |
+
+### Compiling
+
+| ID | E/A | Requirement |
+|----|-----|-------------|
+| R22 | E | When a person checks a semantic model, the system reports every problem it finds and records no compilation. |
+| R23 | E | When the system reports a problem, it names a stable problem code and identifies the record responsible. |
+| R24 | E | When a person compiles a valid semantic model, the system produces its artifacts and permanently records the compilation with its content fingerprint and the time. |
+| R25 | E | When a person compiles a model, the system produces a map connecting each generated statement to the record it came from. |
+| R26 | E | When the same definition is compiled twice, the system produces identical artifacts and the same fingerprint, whatever order the records were created in. |
+| R27 | E | When a person compiles a model whose definition has not changed since its last compilation, the system reports it as unchanged. |
+| R28 | E | When a person exports a successful compilation, the system writes its artifacts to a chosen location without compiling again. |
+| R29 | E | When a person compiles or exports, the system makes no change to any source system. |
+| R30 | E | When compilation fails, the system records the failure with its problems and produces no artifacts. |
+| R31 | E | When a person compiles a model, the system produces the same artifacts whether or not any source system is reachable. |
+
+### Refusing to compile bad definitions
+
+| ID | E/A | Requirement |
+|----|-----|-------------|
+| R32 | E | When a supported question has no recorded request behind it, the system reports a problem. |
+| R33 | E | When a supported question names no required concepts, the system reports a problem. |
+| R34 | E | When a compiled concept has no binding to a catalog collection or attribute, the system reports a problem. |
+| R35 | E | When a semantic model declares no grain, or a semantic relationship omits its cardinality, the system reports a problem. |
+| R36 | E | When a concept's definition depends on a concept that does not exist, or the dependencies form a cycle, the system reports a problem. |
+| R37 | E | When a verified query names a concept the model does not expose, the system reports a problem. |
+| R38 | E | When a supported question has no evaluation case that expects an answer, or a declared refusal has no evaluation case that expects a refusal, the system reports a problem. |
+
+### Environment
+
+| ID | E/A | Requirement |
+|----|-----|-------------|
+| R39 | E | When the system is restarted, everything previously recorded is still present. |
+| R40 | A | When a fresh copy is prepared, it can be populated and compiled without network access. |
+| R41 | A | When an input is larger than memory, the system processes it without loading it whole. |
+
+## Out of scope
+
+- **Deploying anything.** Artifacts are produced and handed over. Nothing is installed, executed, or published into a source system.
+- **A conversational surface.** No agent, no natural-language question answering, no tool publication. Those consume a deployed model and there is nothing to deploy to.
+- **Discovery bookkeeping.** Scheduled inspection runs, their progress and error history, and holding results for review before acceptance. Inspection here is a person running it and the result landing in the catalog.
+- **A coverage interface.** Reporting what is unbound, unanswered, or untested as a browsable screen. The problems are reported; presenting them is later work.
+- **Query history and usage.** Ingesting what queries a source system actually ran, and rolling that up.
+- **Report ingestion and column lineage.** Reading delivered files and tracing their columns back to source collections.
+- **Tagging and annotation.** Attaching a person's own labels to catalog records.
+- **Accounts and permissions.** No sign-in, no users, no roles. The whole program is assumed to run where only its owner can reach it.
+- **Editing a source system.** Tlon reads. It never writes back.
+
+## Assumptions
+
+These are interpretations chosen where the request did not say. Each is a veto point.
+
+- **One person at a time.** No concurrent editing, no conflict resolution, no review workflow between two people. Attestation records a name; it does not enforce a second pair of eyes.
+- **Inspection is manual.** A person triggers it. Nothing runs on a schedule.
+- **Absent is not deleted.** R6 chooses marking over removal because the old project lost records that way. A person may still delete deliberately; that is not specified here.
+- **Grain is declared, not inferred.** The system asks for the row grain and checks it is present. It does not work it out from the data.
+- **A verified query is stored text.** The system does not parse it, prove it correct, or run it. R37 checks the concept names it mentions, nothing more.
+- **Evaluation cases are recorded, not executed.** Running them against a live system is later work.
+- **Fingerprint covers the definition, not the clock.** Two compilations of unchanged records match even if made days apart.
+- **Artifacts are written where the person says.** No opinion about where they go or what happens next.
+- **The catalog holds one kind of thing per level.** Sources contain collections, collections contain attributes. Deeper nesting some systems have is flattened into that.
+- **First build only.** This spec covers the offline core. The layers deliberately left out are listed above, not forgotten.
+
+## Vocabulary
+
+- **source system**: an external system whose contents Tlon records. Not part of Tlon.
+- **source**: Tlon's record of one registered source system, including which kind it is.
+- **kind of source**: what family a source belongs to, which determines how it is inspected.
+- **collection**: one observed grouping of records inside a source system.
+- **attribute**: one observed property belonging to a collection.
+- **relationship**: an observed connection between two collections, with direction and cardinality.
+- **cardinality**: how many records on each side of a relationship correspond to one on the other.
+- **catalog**: everything Tlon has recorded about what physically exists.
+- **inspect**: to read a source system and record what it contains.
+- **absent**: recorded as no longer present in the source system, without being discarded.
+- **semantic model**: one coherent business domain that is authored, checked, and compiled as a unit.
+- **business domain**: the area of the business a semantic model covers.
+- **grain**: what one row of a model represents.
+- **entity**: an authored business concept belonging to a semantic model.
+- **dimension**: an authored value used to filter, group, or identify.
+- **metric**: an authored calculation exposed by an entity.
+- **semantic relationship**: an authored join between two entities.
+- **concept**: any authored entity, dimension, metric, or semantic relationship.
+- **binding**: the recorded link from a concept to the collection or attribute that implements it.
+- **bound**: having at least one binding.
+- **vocabulary term**: a word people use for a concept.
+- **kind of term**: whether a term is the preferred name, a synonym, an abbreviation, ambiguous, or deprecated.
+- **request**: something a person actually asked for, preserved word for word.
+- **question**: a normalized, reusable version of one or more requests.
+- **disposition**: whether a question is supported, partly supported, needs a workflow, needs a definition, is out of domain, or is refused.
+- **result grain**: what one row of a question's answer represents.
+- **role**: what a concept does in answering a question, such as measure, grouping, filter, or population grain.
+- **verified query**: a question paired with query text that a named person has attested answers it.
+- **attest**: to state by name that a query answers its question.
+- **unverified**: run but not attested.
+- **evaluation case**: a recorded expectation about how the model should behave for a given question.
+- **kind of case**: whether a case expects a number, a set of rows, an equivalent query, a clarification, or a refusal.
+- **check**: to look for problems without recording anything.
+- **compile**: to turn a checked model into artifacts and record that it happened.
+- **problem**: something that stops a model compiling, named by a stable code and tied to the record responsible.
+- **problem code**: a fixed identifier for a kind of problem, stable across versions.
+- **artifact**: one generated output of a compilation.
+- **content fingerprint**: a value derived from a definition, identical for identical definitions.
+- **map**: the record connecting each generated statement to the record it came from.
+- **compilation**: one permanent record of an attempt to compile, successful or not.
+- **export**: to write an already successful compilation's artifacts to a chosen location.

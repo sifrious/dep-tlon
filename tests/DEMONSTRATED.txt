@@ -1,0 +1,30 @@
+R1    ok   registering a source succeeds
+R1    ok   a registered source is listed
+R30   ok   mysql and postgresql also register
+R30   ok   an unknown engine is refused
+R2    ok   reachability is reported
+R5    ok   tables and views are told apart
+R6    ok   columns keep order, type, default
+R7    ok   composite keys are recorded
+R8    ok   references record on delete
+R9    ok   unique indexes are recorded
+R12   ok   unavailable is recorded, not empty
+R18   ok   a note is kept
+R18   ok   a column note is kept
+R21   ok   sources list their last inspection
+R24   ok   search finds tables and columns
+R25   ok   two sources stay separate
+R13   ok   re-inspection does not duplicate
+R16   ok   the change report names added
+R14   ok   a dropped column shows in the report
+R19   ok   a surviving note is still attached
+R20   ok   a note on a dropped column reads absent
+R23   ok   reverse references are reported
+R26   ok   the export carries the catalog
+R3    ok   the export never leaks the connection
+R17   ok   a failed inspection is reported
+R17   ok   a failure does not make things absent
+R4    ok   removing a source reports what went
+R31   ok   state survives between invocations
+
+28 demonstrated, 0 failed
