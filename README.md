@@ -1,5 +1,9 @@
 # tlon
 
+> **License:** Copyright © 2026 Sifrious. All rights reserved. This is
+> publicly viewable proprietary software, not open-source software. See
+> [LICENSE.md](LICENSE.md).
+
 Reveal schemas, queries, routes, relationships, dependencies, and dataflow.
 
 Portable package in the sifrious portfolio.
