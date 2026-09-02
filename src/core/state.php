@@ -4,7 +4,16 @@ declare(strict_types=1);
 
 namespace Tlon\Core;
 
-final readonly class Source
+interface SourceInterface
+{
+    public function id(): string;
+
+    public function name(): string;
+
+    public function engine(): string;
+}
+
+abstract readonly class AbstractSource implements SourceInterface
 {
     public const ENGINES = ['sqlite', 'mysql', 'postgresql'];
 
@@ -15,7 +24,24 @@ final readonly class Source
         public string $connection,
         public string $registeredAt,
     ) {}
+
+    public function id(): string
+    {
+        return $this->id;
+    }
+
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    public function engine(): string
+    {
+        return $this->engine;
+    }
 }
+
+final readonly class Source extends AbstractSource {}
 
 final readonly class Inspection
 {

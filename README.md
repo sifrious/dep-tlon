@@ -14,4 +14,6 @@ Portable package in the sifrious portfolio.
 
 ## Status
 
-Scaffolding — repository is being brought online as part of the sifrious portfolio. Content and implementation to follow.
+Operational package/application seam with persistent source registration, relational-schema inspection, and analyzer-neutral code-symbol/reference contracts.
+
+Run `php tests/run.php`, `bash tests/e2e.sh`, and `php tests/code.php` to verify the package contracts and application boundary.
