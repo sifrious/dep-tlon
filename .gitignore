@@ -1,2 +1,4 @@
-state.json
-state.json.tmp
+/composer.lock
+/vendor/
+/state.json
+/code-state.json

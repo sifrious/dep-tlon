@@ -126,6 +126,31 @@ final class CodeGraph
     private array $observations = [];
     private array $references = [];
 
+    public static function fromExport(array $data): self
+    {
+        $graph = new self();
+        foreach ($data['symbols'] ?? [] as $row) {
+            $graph->addSymbol(new CodeSymbol($row['id'], $row['repositoryId'], $row['language'], $row['kind']));
+        }
+        foreach ($data['observations'] ?? [] as $row) {
+            $range = $row['range'];
+            $graph->observe(new CodeSymbolObservation(
+                $row['inspectionId'], $row['symbolId'], $row['qualifiedName'], $row['path'],
+                new SourceRange($range['startLine'], $range['startColumn'], $range['endLine'], $range['endColumn']),
+                $row['parserEvidence'] ?? [],
+            ));
+        }
+        foreach ($data['references'] ?? [] as $row) {
+            $range = $row['sourceRange'];
+            $graph->addReference(new CodeReference(
+                $row['id'], $row['inspectionId'], $row['sourceSymbolId'], $row['targetSymbolId'], $row['kind'],
+                new SourceRange($range['startLine'], $range['startColumn'], $range['endLine'], $range['endColumn']),
+                $row['externalTarget'] ?? '', $row['parserEvidence'] ?? [],
+            ));
+        }
+        return $graph;
+    }
+
     public function addSymbol(CodeSymbolInterface $symbol): void
     {
         $id = $symbol->stableId();
@@ -199,5 +224,28 @@ final class CodeGraph
             'observations' => $observations,
             'references' => array_map(fn (CodeReference $r) => $r->export(), array_values($this->references)),
         ];
+    }
+}
+
+final readonly class CodeGraphJsonStore
+{
+    public function __construct(public string $path) {}
+
+    public function save(CodeGraph $graph): void
+    {
+        $directory = dirname($this->path);
+        if (! is_dir($directory) && ! mkdir($directory, 0777, true) && ! is_dir($directory)) {
+            throw new \RuntimeException("Cannot create graph directory: {$directory}");
+        }
+        $json = json_encode($graph->export(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        if (file_put_contents($this->path, $json . "\n", LOCK_EX) === false) {
+            throw new \RuntimeException("Cannot persist code graph: {$this->path}");
+        }
+    }
+
+    public function load(): CodeGraph
+    {
+        if (! is_file($this->path)) { return new CodeGraph(); }
+        return CodeGraph::fromExport(json_decode((string) file_get_contents($this->path), true, flags: JSON_THROW_ON_ERROR));
     }
 }

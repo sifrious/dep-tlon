@@ -1,0 +1,13 @@
+{
+    "name": "sifrious/tlon-demo-app",
+    "description": "Application-owned route proving the Tlon package seam.",
+    "type": "project",
+    "license": "proprietary",
+    "repositories": [
+        {"type": "path", "url": "..", "options": {"symlink": true}}
+    ],
+    "require": {
+        "php": "^8.4",
+        "sifrious/tlon": "@dev"
+    }
+}

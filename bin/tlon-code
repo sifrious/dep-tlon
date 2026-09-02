@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Tlon\Core\{CodeGraphJsonStore, CodeInspectionService, HashSymbolIdentityProvider, PhpAnalyzerAdapter, TypeScriptAnalyzerAdapter};
+
+if ($argc < 5) {
+    fwrite(STDERR, "usage: bin/tlon-code REPOSITORY_ID INSPECTION_ID STATE_JSON FILE...\n");
+    exit(2);
+}
+
+[, $repositoryId, $inspectionId, $statePath] = array_slice($argv, 0, 4);
+$paths = array_slice($argv, 4);
+$identity = new HashSymbolIdentityProvider();
+$service = new CodeInspectionService([new PhpAnalyzerAdapter($identity), new TypeScriptAnalyzerAdapter($identity)]);
+$store = new CodeGraphJsonStore($statePath);
+$graph = $store->load();
+$summary = $service->inspectFiles($graph, $repositoryId, $inspectionId, $paths);
+$store->save($graph);
+echo json_encode($summary, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";

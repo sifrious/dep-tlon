@@ -1,0 +1,20 @@
+{
+    "name": "sifrious/tlon",
+    "description": "Portable schema and code-structure inspection contracts.",
+    "type": "library",
+    "license": "proprietary",
+    "autoload": {
+        "files": [
+            "src/core/state.php",
+            "src/core/events.php",
+            "src/core/queries.php",
+            "src/core/step.php",
+            "src/core/code.php",
+            "src/core/analyzers.php",
+            "src/core/package.php"
+        ]
+    },
+    "require": {
+        "php": "^8.4"
+    }
+}
